@@ -134,14 +134,20 @@ contract LiquidationPool is ILiquidationPool {
 
     function consolidatePendingStakes() private {
         uint256 deadline = block.timestamp - 1 days;
+        // Iterate over each pending stake
         for (int256 i = 0; uint256(i) < pendingStakes.length; i++) {
+            // Retrieve the pending stake at index i
             PendingStake memory _stake = pendingStakes[uint256(i)];
+            // Check if the pending stake is older than the deadline
             if (_stake.createdAt < deadline) {
+                // Consolidate the pending stake into the corresponding position
                 positions[_stake.holder].holder = _stake.holder;
                 positions[_stake.holder].TST += _stake.TST;
                 positions[_stake.holder].EUROs += _stake.EUROs;
+                // Delete the consolidated pending stake
                 deletePendingStake(uint256(i));
                 // pause iterating on loop because there has been a deletion. "next" item has same index
+                // "Next" item has the same index, so decrement i.
                 i--;
             }
         }
